@@ -99,6 +99,14 @@ struct thread
 #endif
 
     /* Owned by thread.c. */
+
+    int64_t wakeup_tick;  //tick when thread should wake up
+
+    int base_priority; //priority before donation
+    struct list donors; //threads donating priority to this thread
+    struct list_elem donor_elem; //list element we are donating
+    struct lock *waiting_on; //lock we are currently waiting for
+
     unsigned magic;                     /**< Detects stack overflow. */
   };
 
@@ -113,11 +121,19 @@ void thread_start (void);
 void thread_tick (void);
 void thread_print_stats (void);
 
+void thread_sleep(int64_t wakeup_tick);
+void thread_wakeup(int64_t current_tick);   //declaration for thread wakeup
+
 typedef void thread_func (void *aux);
 tid_t thread_create (const char *name, int priority, thread_func *, void *);
 
 void thread_block (void);
 void thread_unblock (struct thread *);
+bool thread_priority_greater(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
+
+void thread_update_priority(struct thread *t);
+bool thread_priority_greater(const struct list_elem *a, const struct list_elem *b, void *aux);
+void thread_yield_if_not_highest(void); //yield if there is a higher priority thread ready
 
 struct thread *thread_current (void);
 tid_t thread_tid (void);
