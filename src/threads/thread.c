@@ -150,7 +150,7 @@ void thread_sleep(int64_t wakeup_tick)
   struct thread *cur = thread_current();
   cur->wakeup_tick = wakeup_tick; //set the wakeup time for this thread
 
-  enum intr_level old_level = intr_disable(); //disable interrupts so we can modify the sleep list
+  enum intr_level old_level = intr_disable(); //disable interrupts so can modify the sleep list
 
   list_push_back(&sleep_list, &cur->elem); //add thread to the sleep list
 
@@ -161,21 +161,21 @@ void thread_sleep(int64_t wakeup_tick)
 
 //function to wake up threads that are done sleeping
 void thread_wakeup(int64_t current_tick) {
-    struct list_elem *e;
-    
-    // go through sleep list and wake up threads that are done
-    e = list_begin(&sleep_list);
-    while (e != list_end(&sleep_list)) {
-        struct thread *t = list_entry(e, struct thread, elem);
-        
-        // check if this thread's sleep time is up 
-        if (t->wakeup_tick <= current_tick) {
-            e = list_remove(e); // remove returns the next element 
-            thread_unblock(t);
-        } else {
-            e = list_next(e); // move to next thread
-        }
-    }
+  struct list_elem *e;
+  
+  // go through sleep list and wake up threads that are done
+  e = list_begin(&sleep_list);
+  while (e != list_end(&sleep_list)) {
+      struct thread *t = list_entry(e, struct thread, elem);
+      
+      // check if this thread's sleep time is up 
+      if (t->wakeup_tick <= current_tick) {
+          e = list_remove(e); // remove returns the next element 
+          thread_unblock(t);
+      } else {
+          e = list_next(e); // move to next thread
+      }
+  }
 }
 
 /** Prints thread statistics. */
@@ -359,11 +359,9 @@ thread_yield (void)
 }
 
 // comparator for priority ordering, higher priority goes first
-bool 
-thread_priority_greater(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
+bool thread_priority_greater(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
 {
-  return list_entry(a, struct thread, elem)->priority
-       > list_entry(b, struct thread, elem)->priority;
+  return list_entry(a, struct thread, elem)->priority > list_entry(b, struct thread, elem)->priority;
 }
 
 /** Invoke function 'func' on all threads, passing along 'aux'.
@@ -406,8 +404,7 @@ thread_get_priority (void)
   return thread_current ()->priority;
 }
 
-void thread_update_priority(struct thread *t)
-{
+void thread_update_priority(struct thread *t){
   int max_prio = t->base_priority; //start with base priority
   struct list_elem *e;
 
@@ -423,8 +420,7 @@ void thread_update_priority(struct thread *t)
   t->priority = max_prio; //update to highest priority
 }
 
-void thread_yield_if_not_highest(void)
-{
+void thread_yield_if_not_highest(void){
   if (!list_empty(&ready_list)) {
       struct thread *highest = list_entry(list_front(&ready_list), struct thread, elem);
       if (highest->priority > thread_current()->priority){
