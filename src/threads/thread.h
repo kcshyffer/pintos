@@ -107,6 +107,9 @@ struct thread
     struct list_elem donor_elem; //list element we are donating
     struct lock *waiting_on; //lock we are currently waiting for
 
+    int exit_status; // exit status of this process
+    bool is_user; //true if this thread is running a user prog
+
     unsigned magic;                     /**< Detects stack overflow. */
   };
 

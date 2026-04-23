@@ -551,6 +551,8 @@ init_thread (struct thread *t, const char *name, int priority)
   t->waiting_on = NULL; //set to not waiting on any locks
   list_init(&t->donors); //empty donors list
 
+  t->exit_status = 0; //default exit status is 0
+
   t->magic = THREAD_MAGIC;
 
   old_level = intr_disable ();
